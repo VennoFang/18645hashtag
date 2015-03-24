@@ -18,7 +18,9 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 
 	Map<String, Integer> jobFeatures = null;
 	Log log = LogFactory.getLog(SimilarityMapper.class);
-
+	Map<String, Integer> features_Vector = new HashMap<String, Integer>();
+	List<Map<String,Integer>> allFeatures = new ArrayList<Map<String,Integer>>();
+	List<String> hashtagNames = new ArrayList<String>();
 	/**
 	 * We compute the inner product of feature vector of every hashtag with that
 	 * of #job
@@ -30,6 +32,7 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 		//log.info("[VALUE]"+value);
 		//log.info("[CONTEXT]"+context);
 		String line = value.toString();
+		
 		//log.info("[LINE]"+line);
 		
 		//String featureTemp = context.getConfiguration().get("FeatureVectors");
@@ -43,25 +46,14 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 		for(int i=0; i<valueSplit.length - valueSplit.length%2; i+=2) {
 			String hashtag = valueSplit[i];
 			hashtagNamesMapperInput.add(hashtag);
-			Map<String, Integer> features_Vector = parseFeatureVector(valueSplit[i+1]);
-			allFeaturesMapperInput.add(features_Vector);
+			Map<String, Integer> features_Vectors = parseFeatureVector(valueSplit[i+1]);
+			allFeaturesMapperInput.add(features_Vectors);
 		}
 		
 		
 		
 		//start driver passing
-		String[] features = featureTemp.split("\t");
-		List<String> hashtagNames = new ArrayList<String>();
-		List<Map<String,Integer>> allFeatures = new ArrayList<Map<String,Integer>>();
-		//rewrite here to suit the input format
-		for(int i=0; i<features.length - features.length%2; i+=2) {
-			//String[] feature = features[i+1].split("\\s+", 2);
-			//log.info("**Feature= "+features[i]);
-			String hashtag = features[i];
-			hashtagNames.add(hashtag);
-			Map<String, Integer> features_Vector = parseFeatureVector(features[i+1]);
-			allFeatures.add(features_Vector);
-		}
+		
 		
 		//String[] hashtag_featureVector = line.split("\\s+", 2);
 
@@ -100,7 +92,20 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 	protected void setup(Context context) {
 		//String jobFeatureVector = context.getConfiguration().get(
 		//		"jobFeatureVector");
-		//jobFeatures = parseFeatureVector(jobFeatureVector);		
+		//jobFeatures = parseFeatureVector(jobFeatureVector);
+		String featureTemp = Driver.buffer;
+		String[] features = featureTemp.split("\t");
+		
+		
+		//rewrite here to suit the input format
+		for(int i=0; i<features.length - features.length%2; i+=2) {
+			//String[] feature = features[i+1].split("\\s+", 2);
+			//log.info("**Feature= "+features[i]);
+			String hashtag = features[i];
+			hashtagNames.add(hashtag);
+			features_Vector = parseFeatureVector(features[i+1]);
+			allFeatures.add(features_Vector);
+		}
 	}
 
 	/**

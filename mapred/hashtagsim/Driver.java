@@ -32,7 +32,7 @@ public class Driver {
 	}
 
 	public static void main(String args[]) throws Exception {
-		System.out.println("Version 23-20-28-06");
+		System.out.println("Version 03-24-20-50");
 		
 		SimpleParser parser = new SimpleParser(args);
 
@@ -47,9 +47,15 @@ public class Driver {
 		List<String> FeatureVector = null;
 		while(true){
 			String filename = tmpdir + "/feature_vector" + "/part-r-" + getFiveDigitNumber(count);
+			System.out.println(filename);
 			List<String> FeatureVectorPart = loadFeatureVector(filename);
-			if(FeatureVectorPart == null)
-				 break;
+			if(FeatureVectorPart != null) {
+				System.out.println("??????????????????????WHY STILL NOT WORK");
+			}
+			if(FeatureVectorPart == null) {
+				System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GOING TO BREAK"); 
+				break;
+			}
 			if(FeatureVector == null)
 			{
 				FeatureVector = FeatureVectorPart;
