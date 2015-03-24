@@ -69,8 +69,12 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 		//Map<String, Integer> features = parseFeatureVector(hashtag_featureVector[1]);
 
 		
-		ArrayList<ArrayList<Integer>> similarity = multipleInnerProductAtATime(
-				allFeaturesMapperInput, allFeatures);
+		ArrayList<ArrayList<Integer>> similarity = multipleInnerProductAtATime
+				(
+						allFeaturesMapperInput, 
+						allFeatures,
+						hashtagNamesMapperInput,
+						hashtagNames);
 		for(int i=0; i<similarity.size(); i++) {
 			for(int j=0; j<similarity.get(i).size(); j++) {
 				//if(i==j) continue;
@@ -134,7 +138,10 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 	
 	private ArrayList<ArrayList<Integer>> multipleInnerProductAtATime(
 			List<Map<String,Integer>> featureVectors1,
-			List<Map<String,Integer>> featureVectors2)
+			List<Map<String,Integer>> featureVectors2,
+			List<String> fName1,
+			List<String> fName2
+			)
 	{
 		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
 		int count1 = featureVectors1.size();
@@ -148,6 +155,12 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 		{
 			for(int j = 0; j < count2; j++)
 			{
+				
+				if(fName1.get(i).compareTo(fName2.get(j)) >= 0)
+				{
+					result.get(i).add(0);
+				}
+				else
 				result.get(i).add(computeInnerProduct(featureVectors1.get(i),featureVectors2.get(j)));
 			}
 		}
