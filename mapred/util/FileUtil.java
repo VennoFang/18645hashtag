@@ -60,6 +60,12 @@ public class FileUtil {
 			str = reader.readLine();
 		}
 		reader.close();
+		if(result != null) {
+			System.out.println("&&&&&&&&&&&&&&&&&&WHY");
+		} 
+		if(result == null) {
+			System.out.println("23333333333333333333333");
+		}
 		return result;
 	}
 
