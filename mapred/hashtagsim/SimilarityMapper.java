@@ -19,7 +19,9 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, Text, IntWritab
 
 	Map<String, Integer> jobFeatures = null;
 	Log log = LogFactory.getLog(SimilarityMapper.class);
-
+	Map<String, Integer> features_Vector = new HashMap<String, Integer>();
+	List<Map<String,Integer>> allFeatures = new ArrayList<Map<String,Integer>>();
+	List<String> hashtagNames = new ArrayList<String>();
 	/**
 	 * We compute the inner product of feature vector of every hashtag with that
 	 * of #job
@@ -31,6 +33,7 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, Text, IntWritab
 		//log.info("[VALUE]"+value);
 		//log.info("[CONTEXT]"+context);
 		String line = value.toString();
+		
 		//log.info("[LINE]"+line);
 		
 		//String featureTemp = context.getConfiguration().get("FeatureVectors");
@@ -49,6 +52,7 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, Text, IntWritab
 		        //System.out.println(pair.getKey() + " = " + pair.getValue());
 		        hashtagNamesMapperInput.add((String) pair.getKey());
 		        }
+
 		
 		for(int i = 0; i < hashtagNamesMapperInput.size(); i++)
 		{
@@ -77,9 +81,7 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, Text, IntWritab
 	 */
 	@Override
 	protected void setup(Context context) {
-		//String jobFeatureVector = context.getConfiguration().get(
-		//		"jobFeatureVector");
-		//jobFeatures = parseFeatureVector(jobFeatureVector);		
+
 	}
 
 	/**

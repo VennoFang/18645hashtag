@@ -41,29 +41,9 @@ public class Driver {
 		String tmpdir = parser.get("tmpdir");
 
 		//getJobFeatureVector(input, tmpdir + "/job_feature_vector");
+		
 		getHashtagFeatureVector(input, tmpdir + "/feature_vector");
-
-		/*
-		int count = 0;
-		List<String> FeatureVector = null;
-		while(true){
-			String filename = tmpdir + "/feature_vector" + "/part-r-" + getFiveDigitNumber(count);
-			List<String> FeatureVectorPart = loadFeatureVector(filename);
-			if(FeatureVectorPart == null)
-				 break;
-			if(FeatureVector == null)
-			{
-				FeatureVector = FeatureVectorPart;
-			}
-			else
-			{
-				FeatureVector.addAll(FeatureVectorPart);
-			}
-			count++;
-			//System.out.println("Job feature vector: " + FeatureVector);
-		}
-		*/
-			getHashtagSimilarities(tmpdir + "/feature_vector",
+		getHashtagSimilarities(tmpdir + "/feature_vector",
 					output);
 		
 	}
@@ -105,8 +85,10 @@ public class Driver {
 		// Since there'll be only 1 reducer that process the key "#job", result
 		// will be saved in the first result file, i.e., part-r-00000
 		File f = new File(dir);
-		if(!f.exists())
+		if(!f.exists()) {
+			System.out.println("********************************"+dir);
 			return null;
+		}
 		List<String> featureVector = FileUtil.newLoad(dir);
 
 		// The feature vector looks like "#job word1:count1;word2:count2;..."
@@ -128,6 +110,7 @@ public class Driver {
 				"Get feature vector for all hashtags");
 		job.setClasses(HashtagMapper.class, HashtagReducer.class, null);
 		job.setMapOutputClasses(Text.class, Text.class);
+		job.setReduceJobs(8);
 		job.run();
 	}
 
@@ -160,6 +143,7 @@ public class Driver {
 				"Get similarities between each part and all other hashtags");
 		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, null);
 		job.setMapOutputClasses(Text.class,IntWritable.class);
+		job.setReduceJobs(1);
 		job.run();
 	}
 }
