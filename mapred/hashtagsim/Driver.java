@@ -141,9 +141,9 @@ public class Driver {
 		//buffer = featureBuffer.toString();
 		Optimizedjob job = new Optimizedjob(conf, input, output,
 				"Get similarities between each part and all other hashtags");
-		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, null);
+		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, SimilarityCombiner.class);
 		job.setMapOutputClasses(Text.class,IntWritable.class);
-		job.setReduceJobs(1);
+		job.setReduceJobs(6);
 		job.run();
 	}
 }
