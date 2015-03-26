@@ -3,6 +3,7 @@ package mapred.hashtagsim;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
+public class SimilarityMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
 	Map<String, Integer> jobFeatures = null;
 	Log log = LogFactory.getLog(SimilarityMapper.class);
@@ -33,58 +34,36 @@ public class SimilarityMapper extends Mapper<LongWritable, Text, IntWritable, Te
 		//log.info("[LINE]"+line);
 		
 		//String featureTemp = context.getConfiguration().get("FeatureVectors");
-		String featureTemp = Driver.buffer;
+		//String featureTemp = Driver.buffer;
 		//log.info("CALLED!!!");
 		//starting value parsing
 		String[] valueSplit = line.split("\t");
 		List<String> hashtagNamesMapperInput = new ArrayList<String>();
 		List<Map<String,Integer>> allFeaturesMapperInput = new ArrayList<Map<String,Integer>>();
 		//rewrite here to suit the input format
-		for(int i=0; i<valueSplit.length - valueSplit.length%2; i+=2) {
-			String hashtag = valueSplit[i];
-			hashtagNamesMapperInput.add(hashtag);
-			Map<String, Integer> features_Vector = parseFeatureVector(valueSplit[i+1]);
-			allFeaturesMapperInput.add(features_Vector);
-		}
+		String hashtag = valueSplit[0];
+		Map<String, Integer> features_Vector = parseFeatureVector(valueSplit[1]);
+		Iterator it = features_Vector.entrySet().iterator();
+		while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+		        //System.out.println(pair.getKey() + " = " + pair.getValue());
+		        hashtagNamesMapperInput.add((String) pair.getKey());
+		        }
 		
-		
-		
-		//start driver passing
-		String[] features = featureTemp.split("\t");
-		List<String> hashtagNames = new ArrayList<String>();
-		List<Map<String,Integer>> allFeatures = new ArrayList<Map<String,Integer>>();
-		//rewrite here to suit the input format
-		for(int i=0; i<features.length - features.length%2; i+=2) {
-			//String[] feature = features[i+1].split("\\s+", 2);
-			//log.info("**Feature= "+features[i]);
-			String hashtag = features[i];
-			hashtagNames.add(hashtag);
-			Map<String, Integer> features_Vector = parseFeatureVector(features[i+1]);
-			allFeatures.add(features_Vector);
-		}
-		
-		//String[] hashtag_featureVector = line.split("\\s+", 2);
-
-		//String hashtag = hashtag_featureVector[0];
-		//Map<String, Integer> features = parseFeatureVector(hashtag_featureVector[1]);
-
-		
-		ArrayList<ArrayList<Integer>> similarity = multipleInnerProductAtATime
-				(
-						allFeaturesMapperInput, 
-						allFeatures,
-						hashtagNamesMapperInput,
-						hashtagNames);
-		for(int i=0; i<similarity.size(); i++) {
-			for(int j=0; j<similarity.get(i).size(); j++) {
-				//if(i==j) continue;
-				String hashtag1 = hashtagNamesMapperInput.get(i);
-				String hashtag2 = hashtagNames.get(j);
-				//log.info("[1]"+hashtag1);
-				//log.info("[2]"+hashtag2);
-				if(hashtag1.compareTo(hashtag2) >= 0) continue;
-				
-				context.write(new IntWritable(similarity.get(i).get(j)), new Text(hashtag1 + " " + hashtag2));
+		for(int i = 0; i < hashtagNamesMapperInput.size(); i++)
+		{
+			for(int j = 0; j < hashtagNamesMapperInput.size(); j++)
+			{
+				String n1 = hashtagNamesMapperInput.get(i);
+				String n2 = hashtagNamesMapperInput.get(j);
+				if(i!=j && n1.compareTo(n2)>=0)
+				{
+					context.write(
+							new Text(n1+" "+n2),
+							new IntWritable(features_Vector.get(n1)*features_Vector.get(n2))
+							
+							);
+				}
 			}
 		}
 		//context.write(new IntWritable(similarity), new Text("#job\t" + hashtag));

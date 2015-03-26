@@ -32,7 +32,7 @@ public class Driver {
 	}
 
 	public static void main(String args[]) throws Exception {
-		System.out.println("Version 23-20-28-06");
+		System.out.println("Version 25-23-36-00");
 		
 		SimpleParser parser = new SimpleParser(args);
 
@@ -43,6 +43,7 @@ public class Driver {
 		//getJobFeatureVector(input, tmpdir + "/job_feature_vector");
 		getHashtagFeatureVector(input, tmpdir + "/feature_vector");
 
+		/*
 		int count = 0;
 		List<String> FeatureVector = null;
 		while(true){
@@ -61,7 +62,8 @@ public class Driver {
 			count++;
 			//System.out.println("Job feature vector: " + FeatureVector);
 		}
-			getHashtagSimilarities(FeatureVector, tmpdir + "/feature_vector",
+		*/
+			getHashtagSimilarities(tmpdir + "/feature_vector",
 					output);
 		
 	}
@@ -87,6 +89,7 @@ public class Driver {
 		job.setClasses(JobMapper.class, JobReducer.class, null);
 		job.setMapOutputClasses(Text.class, Text.class);
 		job.setReduceJobs(1);
+	
 
 		job.run();
 	}
@@ -143,20 +146,20 @@ public class Driver {
 	 * @throws ClassNotFoundException
 	 * @throws InterruptedException
 	 */
-	private static void getHashtagSimilarities(List<String> jobFeatureVector,
+	private static void getHashtagSimilarities(
 			String input, String output) throws IOException,
 			ClassNotFoundException, InterruptedException {
 		// Share the feature vector of #job to all mappers.
 		Configuration conf = new Configuration();
-		StringBuffer featureBuffer  = new StringBuffer();
-		for(int i = 0 ; i < jobFeatureVector.size(); i++)
-			featureBuffer.append(jobFeatureVector.get(i) + "\t");
+		//StringBuffer featureBuffer  = new StringBuffer();
+		//for(int i = 0 ; i < jobFeatureVector.size(); i++)
+		//	featureBuffer.append(jobFeatureVector.get(i) + "\t");
 		//conf.set("FeatureVectors", featureBuffer.toString());
-		buffer = featureBuffer.toString();
+		//buffer = featureBuffer.toString();
 		Optimizedjob job = new Optimizedjob(conf, input, output,
 				"Get similarities between each part and all other hashtags");
-		job.setClasses(SimilarityMapper.class, null, null);
-		job.setMapOutputClasses(IntWritable.class, Text.class);
+		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, null);
+		job.setMapOutputClasses(Text.class,IntWritable.class);
 		job.run();
 	}
 }
