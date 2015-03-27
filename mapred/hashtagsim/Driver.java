@@ -32,7 +32,7 @@ public class Driver {
 	}
 
 	public static void main(String args[]) throws Exception {
-		System.out.println("Version 25-23-36-00");
+		System.out.println("Only 100000+ Version 26-17-22-20");
 		
 		SimpleParser parser = new SimpleParser(args);
 
@@ -86,7 +86,7 @@ public class Driver {
 		// will be saved in the first result file, i.e., part-r-00000
 		File f = new File(dir);
 		if(!f.exists()) {
-			System.out.println("********************************"+dir);
+			//System.out.println("********************************"+dir);
 			return null;
 		}
 		List<String> featureVector = FileUtil.newLoad(dir);
@@ -110,7 +110,7 @@ public class Driver {
 				"Get feature vector for all hashtags");
 		job.setClasses(HashtagMapper.class, HashtagReducer.class, null);
 		job.setMapOutputClasses(Text.class, Text.class);
-		job.setReduceJobs(8);
+		job.setReduceJobs(6);
 		job.run();
 	}
 
@@ -141,7 +141,7 @@ public class Driver {
 		//buffer = featureBuffer.toString();
 		Optimizedjob job = new Optimizedjob(conf, input, output,
 				"Get similarities between each part and all other hashtags");
-		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, SimilarityCombiner.class);
+		job.setClasses(SimilarityMapper.class, SimilarityReducer.class, null);
 		job.setMapOutputClasses(Text.class,IntWritable.class);
 		job.setReduceJobs(6);
 		job.run();
