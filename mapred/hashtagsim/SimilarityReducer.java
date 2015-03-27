@@ -39,6 +39,6 @@ public class SimilarityReducer extends Reducer<Text, IntWritable, LongWritable, 
 		
 		
 		
-		if(count > 100000) context.write(new LongWritable(count), key);
+		context.write(new LongWritable(count), key);
 	}
 }
